@@ -4,33 +4,55 @@ By: Veda Patel
 
 This project was carried out from May-June 2023. 
 
-## Background:
 
-In today's digital music industry, there is an abundance of ways people can listen to music. Music streaming platforms like Spotify and Apple Music have transformed the way we listen to music by providing instant access to their extensive library of songs from millions of artists across various genres. However, individuals often have diverse musical preferences and might want to make playlists dependent on their mood or the atmosphere they want to create. By looking into Spotify's API for developers, I found that you can retrieve a song's audio features like danceability, energy, and tempo. With the Spotify API, I saw an opportunity to utilize these audio features to categorize songs into distinct "moods" and recommend songs for a user's playlists.
+## Table of Contents
+|Folder Name|File Name|File Description|
+|---        |---      |---             |
+|main|`README.md`| This README file contains an executive summary of the project.|
+|main|`song_recommender_project.pdf`| This is my project presentation.|
+|data|`spotify_songs.csv`|The original song data collected from the spotify API in the [data collection notebook](https://github.com/vedapatel99/song_classification_playlist_generator/blob/main/notebooks/01_Data_Collection.ipynb).|
+|data|`spotify_songs_clustered.csv`|The song data with the two cluster label columns added in the [preprocessing/EDA notebook](https://github.com/vedapatel99/song_classification_playlist_generator/blob/main/notebooks/02_Preprocessing_EDA.ipynb).|
+|images| 16 files|This folder contains all the saved plots/visuals created in the [preprocessing/EDA notebook](https://github.com/vedapatel99/song_classification_playlist_generator/blob/main/notebooks/02_Preprocessing_EDA.ipynb).|
+|notebooks|`01_Data_Collection.ipynb`|In this notebook, I performed my data collection from Spotify's API.|
+|notebooks|`02_Preprocessing_EDA.ipynb`|In this notebook, I clean the data, perform EDA, and implement clustering techniques to add classification labels to the data.|
+|notebooks|`03_Modeling_Evaluation.ipynb`|In this notebook, I conduct multiclass classification modeling on the data, evaluate each models performance and finally create a song recommender.|
 
-## Problem Statement:
+## Background
 
-By looking closer at the the patterns among song audio features and utilizing clustering techniques, this project aims to develop a music classification model and recommendation system that enhances a users experience and helps them to curate playlists aligned with their desired mood or vibe. The clustering models will be evaluated based on their silhouette score and the distribution of clusters. The multiclass classification model for the clusters will be assessed for accuracy, F1, precision, and recall scores, prioritized in that order. Evaluating the recommender system is not as simple, since it is subjective to each individual user's preferences. 
+In today's digital music industry, there is an abundance of ways people can listen to music. Music streaming platforms like Spotify and Apple Music have transformed the way we listen to music by providing instant access to their extensive library of songs from millions of artists across various genres. However, individuals often have diverse musical preferences and might want to make playlists dependent on their mood or the atmosphere they want to create. By looking into Spotify's API for developers, I found that you can retrieve a song's audio features like danceability, energy, and tempo (to name a few). With the Spotify API, I saw an opportunity to utilize these audio features to categorize songs into distinct "moods" and recommend songs for a user's playlists.
+
+## Problem Statement
+
+By looking closer at the the patterns among song audio features and utilizing clustering techniques, this project aims to develop a music classification model and recommendation system that enhances a users experience and helps them to curate playlists aligned with their desired mood or vibe. There are many types of models at play in this project that all need to be evaluated in different manners. The clustering models will be evaluated based on their silhouette score and the distribution of clusters. The multiclass classification model for the clusters will be assessed for accuracy, F1, precision, and recall scores, prioritized in that order. Evaluating the recommender system is not as simple since it's subjective to each individual user's music preferences. 
 ________________________________________________________________________
 
-## EDA
+## Data Collection and EDA
+I collected data using the [Spotify API](https://developer.spotify.com/documentation/web-api). In order to collect the song data, I needed a playlist with a substantial number and diverse range of songs. Upon researching, I chose to move forward with data collection from [this playlist](https://open.spotify.com/playlist/5S8SJdl1BDc0ugpkEvFsIL) containing 10,000 songs. A total of 9,961 songs were successfully retrieved from the playlist and after cleaning I was left with 8,816 songs. 
 
-
-
+To conduct EDA, I used various techniques such as examining feature correlations, distributions, scatterplots, and identifying top artist occurrences. Additionally, classification labels were generated by performing Principal Component Analysis (PCA) and clustering techniques. To gain insights into each cluster's characteristics, I created radar plots that showed visual comparisons of feature centroids across different clusters.
 ________________________________________________________________________
 ## Modeling
 
-||Accuracy|Precision|recall|F1|
-|------|-----|-----|-----|-----|
-|model|.98|.98|.98|.98|
-|model|.96|.97|.97|.98|
-|model|.96|.80|.87|.98|
+With the use of song audio data, my objective was to develop a model that could categorize any song into one of the kmeans clusters. To accomplish this, I performed multiclass classification modeling based on the k-means cluster labels and evaluated the performance of each model. Below is a table containing the metrics of each model on the testing dataset.
 
+* GS stands for gridsearch
+
+|Model |Accuracy|Precision|Recall|F1|
+|------|-----|-----|-----|-----|
+|Stacking|0.982305|0.982462|0.982305|0.982323|
+|Logistic Regression|0.977314|0.977463|0.977314|0.977325|
+|Gradient Boosting GS|0.962795|0.963101|0.962795|0.962837|
+|Random Forest GS|0.955989|0.956329|0.955989|0.955945|
+
+From looking at these metrics, I chose the Stacking model as my best model.
+
+The final step was the creation of a recommender model using cosine similarity scores among all the songs in the dataframe. This recommender functions by accepting a song name and the desired number of recommendations, searching for songs that closely match the given song name, and providing a list of recommended songs along with their respective artists and similarity scores.
 ________________________________________________________________________
 
-## Conclusion
+## Conclusions
+The purpose of this project was to aid Spotify users in the curation of playlists. I used KMeans clustering to create classification labels for the songs, which yielded a silhouette score of 0.2694 and a total of 9 song clusters (or "moods"). With these labels, I moved forward with classification modeling. I found a stacking model using logistic regression as the final estimator to be the best model with an accuracy score of 98.23%. Most of the misclassified songs were being placed in cluster 0 or 7, due to imbalanced classes. I tested out the recommender with a few different songs and evaluated it based on my personal opinion since metrics cannot be performed on it. I believe the recommender performs fairly well, but does give some off recommendations sometimes due to the class imbalances and total number of songs available in our data. 
 
 
+## Next Steps/ Recommendations
 
-## Recommendations
-
+Based on the findings of this project, there are several recommendations and potential next steps that can be pursued to further enhance the classification model and recommender system. Since the misclassifications were primarily observed in clusters 0 and 7 due to imbalanced classes, it would be beneficial to explore techniques to address this issue, such as oversampling or simply gathering more data. I would also recommend looking at more types of clustering techniques since this project only explored KMeans and DBSCAN and these cluster labels play such a vital part in the modeling and recommender process. Additionally, it would be helpful to expand the songs dataset to include a larger and more diverse collection of songs. This would hopefully improve the recommender by reducing the chances of it giving off recommendations. Finally, it would be useful to implement the recommender on an online platform, so feedback can be collected on its performance and usability from many people. From this feedback, further and better improvements can be made that are not just based on one person's opinion. 
